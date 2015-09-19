@@ -29,15 +29,47 @@ sealed trait Option[+A] {
     case Some(v) => if (f(v)) Some(v) else None
   }
 
+  def fold[B](default: => B)(f: A => B): B = this match {
+    case None => default
+    case Some(v) => f(v)
+  }
+
+
+
 }
 
 case class Some[+A](get: A) extends Option[A]
 case object None extends Option[Nothing]
 
-object chapter4 {
+object OptionOps {
+
+  def lift[A, B](f: A => B) : Option[A] => Option[B] = x => x.map(f)
+
+  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =
+    a.flatMap(x => b.map(y => f(x, y)))
+
+
+  def sequence[A](lst: List[Option[A]]): Option[List[A]] =  {
+    lst.foldLeft[Option[List[A]]](Some(List.empty[A]))((z, i) => map2(z, i)((a, b) => a :+ b))
+  }
+
+  def sequenceTraverse[A](lst: List[Option[A]]): Option[List[A]] =
+    traverse(lst)(identity)
+
+  def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = {
+    a.foldLeft[Option[List[B]]](Some(List.empty[B]))((z, i) =>map2(z, f(i))((a, b) => a :+ b))
+
+  }
+
+
+}
+
+object Variance {
   def mean(xs: Seq[Double]): Option[Double] =
     if (xs.isEmpty) None else Some(xs.sum / xs.length)
 
   def variance(xs: Seq[Double]): Option[Double] =
     mean(xs).flatMap(m => mean(xs.map(x => math.pow(x - m, 2))))
+
+
 }
