@@ -96,5 +96,14 @@ sealed trait Either[+E, +A] {
     this.flatMap(r1 => b.map(r2 => f(r1, r2)))
 }
 
+object Either {
+  def sequence[E, A](es: List[Either[E, A]]): Either[E, List[A]] =
+    traverse(es)(identity)
+
+  def traverse[E, A, B](es: List[A])(f: A => Either[E, B]): Either[E, List[B]] =
+    es.foldLeft[Either[E, List[B]]](Right(Nil))((z,i) => z.flatMap(l => f(i).map(_ :: l)))
+}
+
+
 case class Left[+E](value: E) extends Either[E, Nothing]
 case class Right[+A](value: A) extends Either[Nothing, A]
