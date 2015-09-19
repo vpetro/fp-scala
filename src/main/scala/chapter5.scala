@@ -14,6 +14,23 @@ trait Stream[+A] {
     }
     helper(this, List.empty[A])
   }
+
+  def drop(n: Int): Stream[A] = {
+    def helper(n: Int, stream: Stream[A]): Stream[A] = stream match {
+      case Empty => Empty
+      case Cons(_, _) if (n == 0) => stream
+      case Cons(_, t) => helper(n - 1, t())
+    }
+    helper(n, this)
+  }
+
+  def take(n: Int): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, t) if (n == 0) => Empty
+    case Cons(h, t) => Stream.cons(h(), t().take(n - 1))
+  }
+
+
 }
 
 case object Empty extends Stream[Nothing]
