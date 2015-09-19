@@ -107,3 +107,6 @@ object Either {
 
 case class Left[+E](value: E) extends Either[E, Nothing]
 case class Right[+A](value: A) extends Either[Nothing, A]
+
+// problem 4.8 - yes. We can implement something like Validation from scalaz,
+// or just use a list to accumulate errors.
