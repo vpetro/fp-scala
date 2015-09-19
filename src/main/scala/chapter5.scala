@@ -30,6 +30,14 @@ trait Stream[+A] {
     case Cons(h, t) => Stream.cons(h(), t().take(n - 1))
   }
 
+  def takeWhile(f: A => Boolean): Stream[A] = this match {
+    case Cons(h, t) => {
+      lazy val head = h()
+      if (f(head)) Stream.cons(head, t().takeWhile(f)) else Empty
+    }
+    case _ => Empty
+  }
+
 
 }
 
