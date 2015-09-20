@@ -1,6 +1,7 @@
 package org.fpscala.chapter5
 
 trait Stream[+A] {
+
   def headOption: Option[A] = this match {
     case Empty => None
     case Cons(h, t) => Some(h())
@@ -30,6 +31,11 @@ trait Stream[+A] {
     case Cons(h, t) => Stream.cons(h(), t().take(n - 1))
   }
 
+  def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
+    case Cons(h, t) => f(h(), t().foldRight(z)(f))
+    case _ => z
+  }
+
   def takeWhile(f: A => Boolean): Stream[A] = this match {
     case Cons(h, t) => {
       lazy val head = h()
@@ -38,6 +44,10 @@ trait Stream[+A] {
     case _ => Empty
   }
 
+  def forAll(f: A => Boolean): Boolean = this match {
+    case Empty => true
+    case Cons(h, t) => f(h()) && t().forAll(f)
+  }
 
 }
 
