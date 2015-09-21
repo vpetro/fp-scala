@@ -55,6 +55,18 @@ trait Stream[+A] {
     case Cons(h, t) => f(h()) && t().forAll(f)
   }
 
+  def map[B](f: A => B): Stream[B] =
+    this.foldRight[Stream[B]](Empty)((i, z) => Stream.cons(f(i), z))
+
+  def filter(f: A => Boolean): Stream[A] =
+    this.foldRight[Stream[A]](Empty)((i, z) => if (f(i)) Stream.cons(i, z) else z)
+
+  def append[B >: A](other: => Stream[B]): Stream[B] =
+    this.foldRight(other)((i, z) => Stream.cons(i, z))
+
+  def flatMap[B](f: A => Stream[B]): Stream[B] =
+    this.foldRight[Stream[B]](Empty)((i, z) => f(i).append(z))
+
 }
 
 case object Empty extends Stream[Nothing]
