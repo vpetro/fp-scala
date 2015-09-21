@@ -88,4 +88,9 @@ object Stream {
 
   def from(n: Int): Stream[Int] = Stream.cons(n, from(n+1))
 
+  def fibs: Stream[Int] = {
+    def go(first: Int, second: Int): Stream[Int] = Stream.cons(first, go(second, first + second))
+    go(0, 1)
+  }
+
 }
