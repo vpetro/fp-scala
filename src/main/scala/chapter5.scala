@@ -11,7 +11,7 @@ trait Stream[+A] {
     @scala.annotation.tailrec
     def helper(stream: Stream[A], acc: List[A]): List[A] = stream match {
       case Empty => acc
-      case Cons(h, t) => helper(stream, h() :: acc)
+      case Cons(h, t) => helper(t(), acc :+ h())
     }
     helper(this, List.empty[A])
   }
