@@ -93,4 +93,8 @@ object Stream {
     go(0, 1)
   }
 
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = {
+    f(z).fold[Stream[A]](Empty) { case (a, s) => Stream.cons(a, unfold(s)(f)) }
+  }
+
 }
