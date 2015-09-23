@@ -92,6 +92,9 @@ trait Stream[+A] {
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     this.foldRight[Stream[B]](Empty)((i, z) => f(i).append(z))
 
+  def startsWith[B >: A](other: Stream[B]): Boolean =
+    this.zipWith(other).foldRight(true)((i, z) => z && (i._1.equals(i._2)))
+
 }
 
 case object Empty extends Stream[Nothing]
