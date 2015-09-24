@@ -95,6 +95,14 @@ trait Stream[+A] {
   def startsWith[B >: A](other: Stream[B]): Boolean =
     this.zipWith(other).foldRight(true)((i, z) => z && (i._1.equals(i._2)))
 
+  def tails: Stream[Stream[A]] =
+    Stream.unfold(this)(n => n.headOption.map(_ => (n.drop(1), n.drop(1))))
+
+  def scanRight1[B >: A](z: => B)(f: (A, => B) => B): Stream[B] =
+    // this doesn't use intermediate results
+    Stream.unfold(this)(n => n.headOption.map(v => (n.drop(1).foldRight(z)(f), n.drop(1))))
+
+
 }
 
 case object Empty extends Stream[Nothing]
