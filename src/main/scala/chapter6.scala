@@ -44,4 +44,17 @@ object RNG {
     val (d3, r3) = double(r2)
     ((d1, d2, d3), r3)
   }
+
+  def ints(count: Int)(rng: RNG): (List[Int], RNG) = {
+    @scala.annotation.tailrec
+    def helper(count: Int, rng: RNG, result: List[Int]): (List[Int], RNG) = {
+      if (count > 0) {
+        val (i, r) = nonNegativeInt(rng)
+        helper(count - 1, r, i +: result)
+      } else {
+        (result, rng)
+      }
+    }
+    helper(count, rng, List.empty[Int])
+  }
 }
