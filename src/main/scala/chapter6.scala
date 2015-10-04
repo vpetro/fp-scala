@@ -21,4 +21,9 @@ object RNG {
     val (i, r) = rng.nextInt
     (if (0 > i) ((i + 1) * (-1)) else i, r)
   }
+
+  def double(rng: RNG): (Double, RNG) = {
+    val (i, r) = nonNegativeInt(rng)
+    (i.toDouble / Int.MaxValue.toDouble + 1.0, r)
+  }
 }
