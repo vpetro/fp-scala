@@ -17,7 +17,7 @@ case class SimpleRNG(seed: Long) extends RNG {
 }
 
 object RNG {
-  def nonNegativeInt(rng: RNG): (Int, RNG) = {
+  val nonNegativeInt: RNG => (Int, RNG) = rng => {
     val (i, r) = rng.nextInt
     (if (0 > i) ((i + 1) * (-1)) else i, r)
   }
@@ -57,4 +57,29 @@ object RNG {
     }
     helper(count, rng, List.empty[Int])
   }
+
+  // note that in the case of unfold we had unfold(start)(current_state => (value, next_state))
+  type Rand[+A] = RNG => (A, RNG)
+
+  val int: Rand[Int] = _.nextInt
+
+  def unit[A](a: A): Rand[A] = rng => (a, rng)
+
+  def map[A,B](s: Rand[A])(f: A => B): Rand[B] =
+    rng => {
+      val (a, rng2) = s(rng)
+      (f(a), rng2)
+    }
+
+  def doubleMap: Rand[Double] =
+    map(nonNegativeInt)(i => i.toDouble / Int.MaxValue.toDouble + 1.0)
+
+  def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
+    rng => {
+      val (a, rng2) = ra(rng)
+      val (b, rng3) = rb(rng2)
+      (f(a, b), rng3)
+    }
+  }
+
 }
