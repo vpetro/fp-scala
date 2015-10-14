@@ -82,4 +82,23 @@ object RNG {
     }
   }
 
+  def both[A, B](ra: Rand[A], rb: Rand[B]): Rand[(A, B)] =
+    map2(ra, rb)((_, _))
+
+  val rantIntDoubleMap2: Rand[(Int, Double)] =
+    both(int, double)
+
+  val randDoubleInt: Rand[(Double, Int)] =
+    both(double, int)
+
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
+    rng => fs.foldLeft((List.empty[A], rng))((z, i) => {
+      val resultList = z._1
+      val currentRng = z._2
+      val (randomVal, newRng) = i(currentRng)
+      (randomVal +: resultList, newRng)
+    })
+
+  def otherSeq[A](fs: List[Rand[A]]): Rand[List[A]] =
+    fs.foldRight(unit(List[A]()))((f, acc) => map2(f, acc)(_ :: _))
 }
