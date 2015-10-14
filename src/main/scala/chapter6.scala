@@ -17,7 +17,7 @@ case class SimpleRNG(seed: Long) extends RNG {
 }
 
 object RNG {
-  val nonNegativeInt: RNG => (Int, RNG) = rng => {
+  def nonNegativeInt: Rand[Int] = rng => {
     val (i, r) = rng.nextInt
     (if (0 > i) ((i + 1) * (-1)) else i, r)
   }
@@ -101,4 +101,19 @@ object RNG {
 
   def otherSeq[A](fs: List[Rand[A]]): Rand[List[A]] =
     fs.foldRight(unit(List[A]()))((f, acc) => map2(f, acc)(_ :: _))
+
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] =
+    rng => {
+      val (a, r1) = f(rng)
+      g(a)(r1)
+    }
+
+  def nonNegativeLessThan(n: Int): Rand[Int] =
+    flatMap(nonNegativeInt) { i =>
+      val mod = i % n
+      if (i + (n-1) - mod >= 0)
+        rng => (mod, rng)
+      else
+        nonNegativeLessThan(n)
+    }
 }
