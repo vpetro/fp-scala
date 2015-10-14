@@ -146,4 +146,18 @@ object State {
 
   def sequence[S, A](fs: List[State[S, A]]): State[S, List[A]] =
     fs.foldRight(unit[S, List[A]](List.empty[A]))((a, z) => a.map2(z)(_ :: _))
+
+  def get[S]: State[S, S] = State(s => (s, s))
+  def set[S](s: S): State[S, Unit] = State(_ => ((), s))
+}
+
+sealed trait Input
+case object Coin extends Input
+case object Turn extends Input
+
+case class Machine(locked: Boolean, candies: Int, coins: Int) 
+
+object Simulation {
+  def simulate(inputs: List[Input]): State[Machine, (Int, Int)] = {
+  }
 }
