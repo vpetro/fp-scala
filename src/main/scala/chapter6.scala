@@ -116,4 +116,10 @@ object RNG {
       else
         nonNegativeLessThan(n)
     }
+
+  def map2FlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra)(a => flatMap(rb)(b => unit(f(a, b))))
+
+  def mapFlatMap[A, B](ra: Rand[A])(f: A => B): Rand[B] =
+    flatMap(ra)(a => unit(f(a)))
 }
